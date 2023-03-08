@@ -1,24 +1,18 @@
 from flask import Flask, request, jsonify
 import requests
-import csv
+
 
 app = Flask(__name__)
 API_URL = 'https://api.baubuddy.de/dev/index.php/v1'
 
-@app.route('/proccess-csv', methods=['POST'])
-def process_csv(csv_file):
 
+@app.route("/upload-csv", methods=["POST"])
+def process_csv():
     # Check if a CSV file was uploaded
-    if 'csv_file' not in request.data:
+    if not request.data:
         return jsonify({'error': 'CSV file not found'}), 400
 
-    csv_file = request.data['csv_file']
-
-    # Load the CSV file into a list of dictionaries
-    csv_data = []
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader:
-        csv_data.append(row)
+    csv_file = request.get_json()
     AUTH_TOKEN = get_auth_token()
     active_vehicles_url = f'{API_URL}/vehicles/select/active'
 
@@ -33,9 +27,10 @@ def process_csv(csv_file):
 
     api_data = response.json()
  
-    # Merge the two data sets, remove duplicates, and filter out vehicles with no hu value
-    merged_data = api_data
-    
+    #Merge the two data sets, remove duplicates, and filter out vehicles with no hu value
+    merged_data = api_data + csv_file
+    merged_data = remove_duplicates(merged_data)
+
     filtered_data = [d for d in merged_data if 'hu' in d and d['hu']]
    
     # Resolve label colors for each vehicle
@@ -46,7 +41,8 @@ def process_csv(csv_file):
         vehicle['labelColors'] = colors
 
     # Return the filtered and annotated data as JSON
-    return jsonify(filtered_data)
+    print('filtered data: ', type(filtered_data))
+    return filtered_data
 
 
 def get_auth_token():
@@ -65,6 +61,18 @@ def get_auth_token():
     return token
 
 
+def remove_duplicates(merged_data):
+    # Create an empty list to hold the unique items
+    unique_data = []
+
+    # Loop through each item in the concatenated list, checking if it is already in the unique list
+    for item in merged_data:
+        if item not in unique_data:
+            unique_data.append(item)
+
+    # Convert the unique list back to JSON format
+    return unique_data
+
 def resolve_vehicle_labels(label_ids, headers):     
     colors = []
     if label_ids is not None:
@@ -81,4 +89,4 @@ def resolve_vehicle_labels(label_ids, headers):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000, host="127.0.0.1")
