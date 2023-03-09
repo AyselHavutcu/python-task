@@ -15,17 +15,16 @@ def read_csv_data():
         return rows
 
 def generate_excel(args):
+
     csv_data = read_csv_data()
-   
-    # Convert csv data to JSON object and send it to the REST API
-   
+
     response = requests.post('http://127.0.0.1:5000/upload-csv', json=csv_data)
+
     # Parse server response and convert it to a DataFrame
     data = response.json()
     
     res_df = pd.DataFrame(data)
-
-    print('args:', args)
+    
     # Sort dataframe by "gruppe" column
     res_df.sort_values('gruppe', inplace=True)
     
