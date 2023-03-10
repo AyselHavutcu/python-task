@@ -1,3 +1,16 @@
+# Running the Program
+
+Steps to follow:
+
+1. Create a virtual env and activate it. (You can use linux or windows)
+
+2. First run **api.py** in a seperate terminal.
+
+3. Then run **clien.py** in another terminal while the api.py code is running(server is up). 
+
+
+
+
 Hello dear python dev!
 
 This repository is supposed to act as a playground for your submission.
