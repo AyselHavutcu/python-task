@@ -6,7 +6,7 @@ Steps to follow:
 
 2. First run **api.py** in a seperate terminal.
 
-3. Then run **clien.py** in another terminal while the api.py code is running(server is up). 
+3. Then run **client.py** in another terminal while the api.py code is running(server is up). 
 
 
 #
